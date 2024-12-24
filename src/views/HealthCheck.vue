@@ -1,6 +1,4 @@
-<script setup lang="ts">
-
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div class="healthCheck">
@@ -19,6 +17,4 @@
   display: grid;
   justify-content: center;
 }
-
-
 </style>

@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: '/health',
       name: 'health',
-      component: HealthCheck
+      component: HealthCheck,
     },
     {
       path: '/about',
