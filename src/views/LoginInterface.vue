@@ -4,11 +4,11 @@
       <div :class="active === 1 ? 'form' : 'form hidden'">
         <div class="title">欢迎 <b>回来</b></div>
         <div class="subtitle">登录你的账户</div>
-        <div class="inputf">
+        <div class="inputFunction">
           <input type="text" placeholder="用户名" />
           <span class="label">用户名</span>
         </div>
-        <div class="inputf">
+        <div class="inputFunction">
           <input type="text" placeholder="密码" />
           <span class="label">密码</span>
         </div>
@@ -17,19 +17,19 @@
       <div :class="active === 2 ? 'form' : 'form hidden'">
         <div class="title">开始</div>
         <div class="subtitle">创建你的账户</div>
-        <div class="inputf">
+        <div class="inputFunction">
           <input type="text" placeholder="用户名" />
           <span class="label">用户名</span>
         </div>
-        <div class="inputf">
+        <div class="inputFunction">
           <input type="text" placeholder="邮箱" />
           <span class="label">邮箱</span>
         </div>
-        <div class="inputf">
+        <div class="inputFunction">
           <input type="text" placeholder="联系方式" />
           <span class="label">联系方式</span>
         </div>
-        <div class="inputf">
+        <div class="inputFunction">
           <input type="text" placeholder="密码" />
           <span class="label">密码</span>
         </div>
@@ -37,10 +37,10 @@
       </div>
       <div :class="active === 1 ? 'card' : 'card active'">
         <div class="head">
-          <div class="name">淳渔<span>影视</span></div>
+          <div class="name">测试用<span>平台</span></div>
         </div>
         <div class="desc">
-          拥有数以万计的电影、电视剧、综艺节目等丰富多元的影视内容，涵盖了各个类型和风格。无论你喜欢的是动作片、爱情片、喜剧片还是科幻片，我们都会有适合你的选择。我们不断跟进最新的影视作品，为你提供最好的观影体验。
+          这是一个测试用平台，目前这里是登录注册界面，需要上传一个由用户名和密码组成的Form给后端处理。
         </div>
         <div class="btn">
           {{ active === 1 ? '新用户 ?' : '已有账号' }}
@@ -111,7 +111,7 @@ const active = ref(1)
         letter-spacing: 1px;
         margin-bottom: 35px;
       }
-      .inputf {
+      .inputFunction {
         width: 100%;
         position: relative;
         margin-bottom: 35px;
