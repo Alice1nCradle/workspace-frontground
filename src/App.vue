@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+// 这个CSS样式表用于将组件全屏
+import './assets/fullscreen.css'
 </script>
 
 <template>
@@ -27,12 +29,5 @@ import { RouterView } from 'vue-router'
 /*
 给所有组件的页面都全屏了，有什么其他需要以后再说
 */
-.fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
-}
+
 </style>
