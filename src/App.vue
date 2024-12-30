@@ -29,5 +29,4 @@ import './assets/fullscreen.css'
 /*
 给所有组件的页面都全屏了，有什么其他需要以后再说
 */
-
 </style>

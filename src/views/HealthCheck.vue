@@ -4,6 +4,8 @@
   <div class="healthCheck">
     <h1 class="healthCheckSuccess">Congratulations!</h1>
     <h2>You can access this website successfully!</h2>
+    <button class="healthCheckResponse">Click here to receive health condition.</button>
+    <h2>Check</h2>
   </div>
 </template>
 

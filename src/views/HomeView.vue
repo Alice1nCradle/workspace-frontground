@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import '../assets/fullscreen.css'
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+  <p>Welcome to our newsletter!</p>
 </template>
+
+<style scoped></style>
