@@ -12,7 +12,7 @@
           <input type="text" placeholder="密码" />
           <span class="label">密码</span>
         </div>
-        <button>登录</button>
+        <button @click="sendLoginFormData">登录</button>
       </div>
       <div :class="active === 2 ? 'form' : 'form hidden'">
         <div class="title">开始</div>
@@ -55,6 +55,40 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import axios from 'axios'
+// 定义登录接口
+// 这个以后肯定得纳入独立模块
+interface LoginFormData {
+  username: string;
+  password: string;
+}
+
+// 创建函数以发送登录请求
+// 这个以后和登录接口放一个模块中
+async function sendLoginFormData(data: LoginFormData) {
+    // 将对象序列化为application/x-www-form-urlencoded格式
+    const params = new URLSearchParams();
+    params.append('username', data.username);
+    params.append('password', data.password);
+
+    // 使用axios向后端post相关数据
+    axios.post(
+      "http://localhost:8000/login",
+      params,
+      {
+        headers: {
+          'content-type': 'application/x-www-form-urlencoded',
+        }
+      }
+    )
+      .then(res => {
+        console.log(res)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+
+}
 
 const active = ref(1)
 </script>
