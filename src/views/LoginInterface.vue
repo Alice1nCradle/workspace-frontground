@@ -9,10 +9,13 @@
           <span class="label">用户名</span>
         </div>
         <div class="inputFunction">
-          <input type="text" placeholder="密码" />
+          <input type="password" placeholder="密码" />
           <span class="label">密码</span>
         </div>
         <button @click="sendLoginFormData">登录</button>
+        <p class="errorMessage" v-if="service_error_flag">
+          服务请求失败，请联系维护人员!
+        </p>
       </div>
       <div :class="active === 2 ? 'form' : 'form hidden'">
         <div class="title">开始</div>
@@ -59,37 +62,41 @@ import axios from 'axios'
 // 定义登录接口
 // 这个以后肯定得纳入独立模块
 interface LoginFormData {
-  username: string;
-  password: string;
+   username: string;
+   password: string;
 }
 
 // 创建函数以发送登录请求
 // 这个以后和登录接口放一个模块中
-async function sendLoginFormData(data: LoginFormData) {
-    // 将对象序列化为application/x-www-form-urlencoded格式
-    const params = new URLSearchParams();
-    params.append('username', data.username);
-    params.append('password', data.password);
-
+function sendLoginFormData(data: LoginFormData) {
+    const params = {
+      username: data.username,
+      password: data.password
+    }
     // 使用axios向后端post相关数据
     axios.post(
-      "http://localhost:8000/login",
-      params,
-      {
-        headers: {
-          'content-type': 'application/x-www-form-urlencoded',
-        }
-      }
+      "http://localhost:8000/auth/login",
+        params
     )
       .then(res => {
-        console.log(res)
+        if(res.status == 200){
+          alert(res.data)
+          location.href = '/health'
+        }
       })
       .catch(err => {
         console.error(err)
+        if(err.code === 'ERR_NETWORK')
+          service_error_flag.value = true
+        if(err.status === 415)
+          alert("用户名或密码错误!")
       })
+    // 请求完后将数据进行复位
+       service_error_flag.value = false
+
 
 }
-
+const service_error_flag = ref(false)
 const active = ref(1)
 </script>
 
@@ -199,6 +206,9 @@ const active = ref(1)
         font-weight: bold;
         font-size: 12px;
         cursor: pointer;
+      }
+      .errorMessage {
+        color: rgb(246, 249, 255);
       }
     }
     .card {
