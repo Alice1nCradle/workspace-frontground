@@ -5,19 +5,18 @@
         <div class="title">欢迎 <b>回来</b></div>
         <div class="subtitle">登录你的账户</div>
         <div class="inputFunction">
-          <input type="text" placeholder="用户名" />
+          <input type="text" placeholder="用户名" v-model="credentials.username" />
           <span class="label">用户名</span>
         </div>
         <div class="inputFunction">
-          <input type="password" placeholder="密码" />
+          <input type="password" placeholder="密码" v-model="credentials.password" />
           <span class="label">密码</span>
         </div>
         <button @click="sendLoginFormData">登录</button>
-        <p class="errorMessage" v-if="service_error_flag">
-          服务请求失败，请联系维护人员!
-        </p>
+        <p class="errorMessage" v-if="service_error_flag">服务请求失败，请联系维护人员!</p>
+        <p class="notNullMessage" v-if="null_flag">用户名或密码不能为空!</p>
       </div>
-      <div :class="active === 2 ? 'form' : 'form hidden'">
+      <div :class="active === 0 ? 'form' : 'form hidden'">
         <div class="title">开始</div>
         <div class="subtitle">创建你的账户</div>
         <div class="inputFunction">
@@ -46,9 +45,9 @@
           这是一个测试用平台，目前这里是登录注册界面，需要上传一个由用户名和密码组成的Form给后端处理。
         </div>
         <div class="btn">
-          {{ active === 1 ? '新用户 ?' : '已有账号' }}
-          <button @click="active = active === 1 ? 2 : 1">
-            {{ active === 1 ? '去注册 ?' : '去登录' }}
+          {{ active === 1 ? '新用户 ?' : '已有账号 ?' }}
+          <button @click="active = (active + 1) % 2">
+            {{ active === 0 ? '登录' : '注册' }}
           </button>
         </div>
       </div>
@@ -57,46 +56,84 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import axios from 'axios'
 // 定义登录接口
 // 这个以后肯定得纳入独立模块
-interface LoginFormData {
-   username: string;
-   password: string;
+
+interface ApiResponse {
+  [key: string]: unknown
 }
 
-// 创建函数以发送登录请求
-// 这个以后和登录接口放一个模块中
-function sendLoginFormData(data: LoginFormData) {
-    const params = {
-      username: data.username,
-      password: data.password
+interface ApiError {
+  error: boolean
+  message: string
+}
+
+const credentials = reactive({
+  username: '',
+  password: '',
+})
+
+// 为 credentials 赋值，在上面的标签中使用了v-model
+
+const response = ref<ApiResponse | ApiError | null>(null)
+
+const sendLoginFormData = async (): Promise<void> => {
+  try {
+    // 首先先对凭据进行检查，如果有一个输入了空数据就可以直接返回错误了
+    // 如果以后用得多了，这个部分也抽离出来成一种方法
+    if (credentials.username.length === 0 || credentials.password.length === 0) {
+      null_flag.value = true
+      // 设置好标志以后直接打断就是了
+      // 也不要老是报错
+      return
     }
-    // 使用axios向后端post相关数据
-    axios.post(
-      "http://localhost:8000/auth/login",
-        params
-    )
-      .then(res => {
-        if(res.status == 200){
-          alert(res.data)
-          location.href = '/health'
-        }
-      })
-      .catch(err => {
-        console.error(err)
-        if(err.code === 'ERR_NETWORK')
-          service_error_flag.value = true
-        if(err.status === 415)
-          alert("用户名或密码错误!")
-      })
-    // 请求完后将数据进行复位
-       service_error_flag.value = false
+    /*
+     注意，前端的检查都是可以绕过的
+     真要检查还得看后端
+     这里检查的目的就是减少这种奇葩请求还能被数据库收到
+     现在不是空数据，那就可以先设置这个标志为false
+    */
+    null_flag.value = false
 
-
+    // 接下来为正常的逻辑
+    // 先生成一个form，然后将credentials中的数据绑定其中
+    const form = new URLSearchParams()
+    // 为form注入数据
+    form.append('username', credentials.username)
+    form.append('password', credentials.password)
+    const res = await axios.post<ApiResponse>('http://localhost:8000/auth/login', form)
+    // 成功了，那就尝试跳转到对应界面
+    // 日后生成cookie就好办了，直接持续存储，失效就重新登录
+    response.value = res.data
+    console.log(res.data)
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Login error occurred:', error)
+      response.value = {
+        error: true,
+        message: error.message || 'Unknown error',
+      }
+      // 服务没启动，告知用户
+      if (error.code === 'ERR_NETWORK') {
+        service_error_flag.value = true
+      }
+      // 认证错误，告知用户
+      if (error.status === 401) {
+        alert('用户名或者密码错误，登录失败!')
+      }
+      // 用户手贱，对用户致以诚挚问候
+      if (error.message === "AAA") {
+        alert('再搞事，我让你飞起来!')
+      }
+    }
+  }
 }
+// 服务运行情况标志
 const service_error_flag = ref(false)
+// 用户凭据输入检查标志
+const null_flag = ref(false)
 const active = ref(1)
 </script>
 
@@ -209,6 +246,11 @@ const active = ref(1)
       }
       .errorMessage {
         color: rgb(246, 249, 255);
+        position: relative;
+      }
+      .notNullMessage {
+        color: rgb(246, 249, 255);
+        position: relative;
       }
     }
     .card {
