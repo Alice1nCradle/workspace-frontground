@@ -96,6 +96,8 @@ const sendLoginFormData = async (): Promise<void> => {
      现在不是空数据，那就可以先设置这个标志为false
     */
     null_flag.value = false
+    // 因为准备进入正常的逻辑了，因此出错标志也可设置为false
+    service_error_flag.value = false
 
     // 接下来为正常的逻辑
     // 先生成一个form，然后将credentials中的数据绑定其中
@@ -103,14 +105,12 @@ const sendLoginFormData = async (): Promise<void> => {
     // 为form注入数据
     form.append('username', credentials.username)
     form.append('password', credentials.password)
-    const res = await axios.post<ApiResponse>('http://localhost:8000/auth/login', form)
+    await axios.post<ApiResponse>('http://localhost/api/auth/login', form)
+    alert('登录成功!')
     // 成功了，那就尝试跳转到对应界面
     // 日后生成cookie就好办了，直接持续存储，失效就重新登录
-    response.value = res.data
-    console.log(res.data)
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error('Login error occurred:', error)
       response.value = {
         error: true,
         message: error.message || 'Unknown error',
@@ -123,7 +123,7 @@ const sendLoginFormData = async (): Promise<void> => {
       if (error.status === 401) {
         alert('用户名或者密码错误，登录失败!')
       }
-      // 用户手贱，对用户致以诚挚问候
+      // 如果用户手贱，就对用户致以诚挚问候
       if (error.message === "AAA") {
         alert('再搞事，我让你飞起来!')
       }
