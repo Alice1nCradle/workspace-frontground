@@ -15,7 +15,7 @@
         <button @click="sendLoginFormData">登录</button>
         <p class="errorMessage" v-if="service_error_flag">服务请求失败，请联系维护人员!</p>
         <p class="notNullMessage" v-if="null_flag">用户名或密码不能为空!</p>
-        <p class="failedMessage" v-if="login_failed_flag">{{ response?.message }}</p>
+        <p class="failedMessage" v-if="login_failed_flag">请重新输入用户名和密码</p>
       </div>
       <div :class="active === 0 ? 'form' : 'form hidden'">
         <div class="title">开始</div>
@@ -109,7 +109,18 @@ const sendLoginFormData = async (): Promise<void> => {
     form.append('username', credentials.username)
     form.append('password', credentials.password)
     await axios.post<ApiResponse>('http://localhost/api/auth/login', form)
-    alert('登录成功!')
+      .then((res) => {
+        if (res.status === 200) {
+          alert("登录成功")
+        }
+      })
+      .catch((err) => {
+        // 认证错误，告知用户
+        if (err.status === 401) {
+          alert('用户名或者密码错误，登录失败!')
+          login_failed_flag.value = true
+        }
+      })
     // 成功了，那就尝试跳转到对应界面
     // 日后生成cookie就好办了，直接持续存储，失效就重新登录
   } catch (error) {
@@ -122,11 +133,7 @@ const sendLoginFormData = async (): Promise<void> => {
       if (error.code === 'ERR_NETWORK') {
         service_error_flag.value = true
       }
-      // 认证错误，告知用户
-      if (error.status === 401) {
-        alert('用户名或者密码错误，登录失败!')
-        login_failed_flag.value = true
-      }
+
       // 如果用户手贱，就对用户致以诚挚问候
       if (error.message === "AAA") {
         alert('再搞事，我让你飞起来!')
