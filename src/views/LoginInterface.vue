@@ -15,6 +15,7 @@
         <button @click="sendLoginFormData">登录</button>
         <p class="errorMessage" v-if="service_error_flag">服务请求失败，请联系维护人员!</p>
         <p class="notNullMessage" v-if="null_flag">用户名或密码不能为空!</p>
+        <p class="failedMessage" v-if="login_failed_flag">{{ response?.message }}</p>
       </div>
       <div :class="active === 0 ? 'form' : 'form hidden'">
         <div class="title">开始</div>
@@ -93,11 +94,13 @@ const sendLoginFormData = async (): Promise<void> => {
      注意，前端的检查都是可以绕过的
      真要检查还得看后端
      这里检查的目的就是减少这种奇葩请求还能被数据库收到
+     数据库要是打死了我负不起责
      现在不是空数据，那就可以先设置这个标志为false
     */
     null_flag.value = false
-    // 因为准备进入正常的逻辑了，因此出错标志也可设置为false
+    // 因为准备进入正常的逻辑了，因此其他错误标志也可设置为false
     service_error_flag.value = false
+    login_failed_flag.value = false
 
     // 接下来为正常的逻辑
     // 先生成一个form，然后将credentials中的数据绑定其中
@@ -122,6 +125,7 @@ const sendLoginFormData = async (): Promise<void> => {
       // 认证错误，告知用户
       if (error.status === 401) {
         alert('用户名或者密码错误，登录失败!')
+        login_failed_flag.value = true
       }
       // 如果用户手贱，就对用户致以诚挚问候
       if (error.message === "AAA") {
@@ -134,6 +138,8 @@ const sendLoginFormData = async (): Promise<void> => {
 const service_error_flag = ref(false)
 // 用户凭据输入检查标志
 const null_flag = ref(false)
+// 用户登录失败标志
+const login_failed_flag = ref(false)
 const active = ref(1)
 </script>
 
@@ -249,6 +255,10 @@ const active = ref(1)
         position: relative;
       }
       .notNullMessage {
+        color: rgb(246, 249, 255);
+        position: relative;
+      }
+      .failedMessage {
         color: rgb(246, 249, 255);
         position: relative;
       }
