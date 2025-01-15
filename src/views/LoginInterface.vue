@@ -108,20 +108,21 @@ const sendLoginFormData = async (): Promise<void> => {
     // 为form注入数据
     form.append('username', credentials.username)
     form.append('password', credentials.password)
-    await axios.post<ApiResponse>('http://localhost/api/auth/login', form)
-      .then((res) => {
-        if (res.status === 200) {
-          alert("登录成功")
+    await axios.post<ApiResponse>('http://localhost:8000/auth/login', form, {
+      maxRedirects: 0,
+    })
+      .then(res => {
+          if (res.status === 302) {
+            window.location.href = res.headers['location']
+          }
         }
-      })
-      .catch((err) => {
-        // 认证错误，告知用户
-        if (err.status === 401) {
-          alert('用户名或者密码错误，登录失败!')
+      )
+      .catch(error => {
+        if (error.status === 401) {
           login_failed_flag.value = true
         }
       })
-    // 成功了，那就尝试跳转到对应界面
+// 成功了，那就尝试跳转到对应界面
     // 日后生成cookie就好办了，直接持续存储，失效就重新登录
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -135,7 +136,7 @@ const sendLoginFormData = async (): Promise<void> => {
       }
 
       // 如果用户手贱，就对用户致以诚挚问候
-      if (error.message === "AAA") {
+      if (error.message === 'AAA') {
         alert('再搞事，我让你飞起来!')
       }
     }
