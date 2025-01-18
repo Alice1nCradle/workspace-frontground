@@ -165,6 +165,8 @@ const active = ref(1)
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 50vw;
+    height: 80vh;
     .form {
       width: 400px;
       height: 500px;
@@ -183,9 +185,11 @@ const active = ref(1)
       align-items: flex-start;
       margin: 0 10px;
       z-index: 3;
+      opacity: 1;
       transition: 0.25s ease-in-out;
 
       &.hidden {
+        opacity: 0;
         height: 395px;
         box-shadow: none;
         z-index: 1;
@@ -321,3 +325,4 @@ const active = ref(1)
   }
 }
 </style>
+
