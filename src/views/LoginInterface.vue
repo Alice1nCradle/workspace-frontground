@@ -108,13 +108,18 @@ const sendLoginFormData = async (): Promise<void> => {
     // 为form注入数据
     form.append('username', credentials.username)
     form.append('password', credentials.password)
-    await axios.post<ApiResponse>('http://localhost:8000/auth/login', form, {
-      maxRedirects: 0,
-    })
-      .then(res => {
-          if (res.status === 302) {
-            window.location.href = res.headers['location']
+    await axios.post<ApiResponse>('http://localhost:8000/auth/login', form,
+      {
+        maxRedirects: 5
+      })
+      .then((response) => {
+        console.log(response.status)
+        console.log(response.headers)
+          if (response.status === 200 && response.headers['location']) {
+            console.log("Redirecting to:", response.headers['location']);
+            window.location.replace = response.headers['location']
           }
+
         }
       )
       .catch(error => {
